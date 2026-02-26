@@ -199,13 +199,50 @@
         li {
             margin-bottom: 0.25rem;
         }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-secondary {
+            background-color: #334155;
+        }
+
+        .btn-secondary:hover {
+            background-color: #475569;
+        }
+
+        #tailor-result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #0f172a;
+            border-radius: 0.5rem;
+            border: 1px solid #334155;
+            display: none;
+        }
+
+        .resume-preview {
+            background-color: #1e293b;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid #334155;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
     </style>
 </head>
 
 <body>
 
     <div class="container">
-        <h1>AI Resume Analyzer</h1>
+        <h1>AI Resume Suite</h1>
 
         <div class="tabs">
             <div class="tab active" onclick="switchTab('text')">Paste Text</div>
@@ -238,10 +275,14 @@
                 placeholder="Paste job description here...">We need a Python Backend Engineer with strong FastAPI skills and AWS experience.</textarea>
         </div>
 
-        <button onclick="analyze()">Analyze Resume</button>
+        <div class="btn-group">
+            <button onclick="analyze()">Analyze Resume</button>
+            <button class="btn-secondary" onclick="tailor()">Tailor Resume</button>
+        </div>
 
-        <div id="loading" class="loading">Analyzing with Gemini AI...</div>
+        <div id="loading" class="loading">Processing with AI...</div>
 
+        <!-- Analysis Results -->
         <div id="result">
             <div class="metric">
                 <div class="percentage" id="score">0%</div>
@@ -256,6 +297,22 @@
 
             <div class="section-title">Suggestions</div>
             <ul id="suggestions"></ul>
+        </div>
+
+        <!-- Tailoring Results -->
+        <div id="tailor-result">
+            <div class="metric">
+                <div class="percentage" id="opt-score">0%</div>
+                <div>Optimization Score</div>
+            </div>
+
+            <div class="section-title">Key Changes Made</div>
+            <ul id="key-changes"></ul>
+
+            <div class="section-title">Tailored Resume Preview</div>
+            <div id="tailored-text" class="resume-preview"></div>
+
+            <button style="margin-top: 1rem;" onclick="copyTailored()">Copy to Clipboard</button>
         </div>
     </div>
 
@@ -284,10 +341,12 @@
         async function analyze() {
             const jd = document.getElementById('jd').value;
             const resultDiv = document.getElementById('result');
+            const tailorDiv = document.getElementById('tailor-result');
             const loading = document.getElementById('loading');
 
             loading.style.display = 'block';
             resultDiv.style.display = 'none';
+            tailorDiv.style.display = 'none';
 
             try {
                 let response;
@@ -328,7 +387,61 @@
                 }
             } catch (error) {
                 console.error(error);
-                alert('Error connecting to API. Make sure uvicorn is running!');
+                alert('Connection failure.');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        async function tailor() {
+            const jd = document.getElementById('jd').value;
+            const resultDiv = document.getElementById('result');
+            const tailorDiv = document.getElementById('tailor-result');
+            const loading = document.getElementById('loading');
+
+            loading.style.display = 'block';
+            resultDiv.style.display = 'none';
+            tailorDiv.style.display = 'none';
+
+            try {
+                let response;
+                if (currentMode === 'text') {
+                    const resume = document.getElementById('resume').value;
+                    response = await fetch('http://127.0.0.1:8000/tailor', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ resume_text: resume, job_description: jd })
+                    });
+                } else {
+                    const file = document.getElementById('resume-file').files[0];
+                    if (!file) {
+                        alert('Please upload a PDF!');
+                        loading.style.display = 'none';
+                        return;
+                    }
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('job_description', jd);
+
+                    response = await fetch('http://127.0.0.1:8000/tailor-pdf', {
+                        method: 'POST',
+                        body: formData
+                    });
+                }
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('opt-score').innerText = data.optimization_score + '%';
+                    fillList('key-changes', data.key_changes);
+                    document.getElementById('tailored-text').innerText = data.tailored_resume;
+                    tailorDiv.style.display = 'block';
+                } else {
+                    alert('Error tailoring resume.');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Connection failure.');
             } finally {
                 loading.style.display = 'none';
             }
@@ -342,6 +455,12 @@
                 li.innerText = item;
                 ul.appendChild(li);
             });
+        }
+
+        function copyTailored() {
+            const text = document.getElementById('tailored-text').innerText;
+            navigator.clipboard.writeText(text);
+            alert('Tailored resume copied to clipboard!');
         }
     </script>
 

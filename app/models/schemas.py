@@ -12,3 +12,9 @@ class AnalyzeResponse(BaseModel):
     strengths: List[str] = Field(default_factory=list)
     improvement_suggestions: List[str] = Field(default_factory=list)
     note: Optional[str] = None
+
+
+class TailorResponse(BaseModel):
+    tailored_resume: str
+    key_changes: List[str]
+    optimization_score: int
