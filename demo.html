@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -142,85 +143,89 @@
         }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <h1>AI Resume Analyzer</h1>
-    
-    <div class="input-group">
-        <label for="resume">Resume Text</label>
-        <textarea id="resume" placeholder="Paste resume content here...">Experienced Python Developer with expertise in FastAPI, Django, and AWS cloud migrations.</textarea>
-    </div>
+    <div class="container">
+        <h1>AI Resume Analyzer</h1>
 
-    <div class="input-group">
-        <label for="jd">Job Description</label>
-        <textarea id="jd" placeholder="Paste job description here...">We need a Python Backend Engineer with strong FastAPI skills and AWS experience.</textarea>
-    </div>
-
-    <button onclick="analyze()">Analyze Resume</button>
-
-    <div id="loading" class="loading">Analyzing with Gemini AI...</div>
-
-    <div id="result">
-        <div class="metric">
-            <div class="percentage" id="score">0%</div>
-            <div>Match Score</div>
+        <div class="input-group">
+            <label for="resume">Resume Text</label>
+            <textarea id="resume"
+                placeholder="Paste resume content here...">Experienced Python Developer with expertise in FastAPI, Django, and AWS cloud migrations.</textarea>
         </div>
-        
-        <div class="section-title">Strengths</div>
-        <ul id="strengths"></ul>
 
-        <div class="section-title">Missing Skills</div>
-        <ul id="missing"></ul>
+        <div class="input-group">
+            <label for="jd">Job Description</label>
+            <textarea id="jd"
+                placeholder="Paste job description here...">We need a Python Backend Engineer with strong FastAPI skills and AWS experience.</textarea>
+        </div>
 
-        <div class="section-title">Suggestions</div>
-        <ul id="suggestions"></ul>
+        <button onclick="analyze()">Analyze Resume</button>
+
+        <div id="loading" class="loading">Analyzing with Gemini AI...</div>
+
+        <div id="result">
+            <div class="metric">
+                <div class="percentage" id="score">0%</div>
+                <div>Match Score</div>
+            </div>
+
+            <div class="section-title">Strengths</div>
+            <ul id="strengths"></ul>
+
+            <div class="section-title">Missing Skills</div>
+            <ul id="missing"></ul>
+
+            <div class="section-title">Suggestions</div>
+            <ul id="suggestions"></ul>
+        </div>
     </div>
-</div>
 
-<script>
-    async function analyze() {
-        const resume = document.getElementById('resume').value;
-        const jd = document.getElementById('jd').value;
-        const resultDiv = document.getElementById('result');
-        const loading = document.getElementById('loading');
+    <script>
+        async function analyze() {
+            const resume = document.getElementById('resume').value;
+            const jd = document.getElementById('jd').value;
+            const resultDiv = document.getElementById('result');
+            const loading = document.getElementById('loading');
 
-        loading.style.display = 'block';
-        resultDiv.style.display = 'none';
+            loading.style.display = 'block';
+            resultDiv.style.display = 'none';
 
-        try {
-            const response = await fetch('http://127.0.0.1:8000/analyze', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ resume_text: resume, job_description: jd })
-            });
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ resume_text: resume, job_description: jd })
+                });
 
-            const data = await response.json();
+                const data = await response.json();
 
-            document.getElementById('score').innerText = data.match_percentage + '%';
-            
-            fillList('strengths', data.strengths);
-            fillList('missing', data.missing_skills);
-            fillList('suggestions', data.improvement_suggestions);
+                document.getElementById('score').innerText = data.match_percentage + '%';
 
-            resultDiv.style.display = 'block';
-        } catch (error) {
-            alert('Error connecting to API. Make sure uvicorn is running!');
-        } finally {
-            loading.style.display = 'none';
+                fillList('strengths', data.strengths);
+                fillList('missing', data.missing_skills);
+                fillList('suggestions', data.improvement_suggestions);
+
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                alert('Error connecting to API. Make sure uvicorn is running!');
+            } finally {
+                loading.style.display = 'none';
+            }
         }
-    }
 
-    function fillList(id, items) {
-        const ul = document.getElementById(id);
-        ul.innerHTML = '';
-        items.forEach(item => {
-            const li = document.createElement('li');
-            li.innerText = item;
-            ul.appendChild(li);
-        });
-    }
-</script>
+        function fillList(id, items) {
+            const ul = document.getElementById(id);
+            ul.innerHTML = '';
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.innerText = item;
+                ul.appendChild(li);
+            });
+        }
+    </script>
 
 </body>
+
 </html>

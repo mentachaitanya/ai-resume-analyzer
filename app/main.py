@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from app.models.schemas import ResumeRequest, AnalyzeResponse
 from app.services.gpt_service import analyze_resume
 
@@ -18,6 +19,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/", include_in_schema=False)
+async def read_index():
+    return FileResponse("demo.html")
 
 @app.post("/analyze", response_model=AnalyzeResponse)
 def analyze(data: ResumeRequest):
