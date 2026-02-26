@@ -1,23 +1,30 @@
 import os
 import json
-import re
 from dotenv import load_dotenv
-from google import genai
+from openai import OpenAI
 
 load_dotenv()
 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+client = OpenAI(
+    api_key=os.getenv("OPENROUTER_API_KEY"),
+    base_url="https://openrouter.ai/api/v1"
+)
+
+MODEL = "openai/gpt-4o-mini"  # You can change model later
 
 
 def analyze_resume(resume_text: str, job_description: str) -> dict:
+
     prompt = f"""
 Analyze the resume against the job description.
 
-Return valid JSON with:
-match_percentage,
-missing_skills,
-strengths,
-improvement_suggestions.
+Return strictly valid JSON:
+{{
+  "match_percentage": number,
+  "missing_skills": [],
+  "strengths": [],
+  "improvement_suggestions": []
+}}
 
 Resume:
 {resume_text[:800]}
@@ -27,23 +34,24 @@ Job Description:
 """
 
     try:
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt,
+        response = client.chat.completions.create(
+            model=MODEL,
+            messages=[
+                {"role": "system", "content": "You are a recruitment AI assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3,
         )
 
-        content = response.text.strip()
-
-        content = re.sub(r"^```json|```$", "", content).strip()
+        content = response.choices[0].message.content.strip()
 
         return json.loads(content)
 
     except Exception:
-        # Fallback for testing / quota issues
         return {
             "match_percentage": 75,
             "missing_skills": ["Cloud deployment"],
             "strengths": ["Python", "REST APIs"],
-            "improvement_suggestions": ["Add AI-based project"],
+            "improvement_suggestions": ["Add production deployment"],
             "note": "Mock fallback response"
         }
