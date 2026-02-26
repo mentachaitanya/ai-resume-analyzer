@@ -2,10 +2,21 @@ from fastapi import FastAPI
 from app.models.schemas import ResumeRequest, AnalyzeResponse
 from app.services.gpt_service import analyze_resume
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(
     title="AI Resume Analyzer",
     description="LLM-powered Resume vs Job Description Matching System",
     version="1.0.0"
+)
+
+# Enable CORS for the demo frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.post("/analyze", response_model=AnalyzeResponse)

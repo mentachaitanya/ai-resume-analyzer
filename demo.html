@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Analyzer Demo</title>
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 800px;
+            border: 1px solid #334155;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            font-size: 2.25rem;
+            font-weight: 800;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dim);
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 0.5rem;
+            color: var(--text);
+            padding: 1rem;
+            font-size: 0.95rem;
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        #result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #0f172a;
+            border-radius: 0.5rem;
+            border: 1px solid #334155;
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            display: none;
+            margin-top: 1rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .metric {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .percentage {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-weight: 700;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        ul {
+            margin: 0;
+            padding-left: 1.2rem;
+            color: var(--text-dim);
+        }
+
+        li {
+            margin-bottom: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>AI Resume Analyzer</h1>
+    
+    <div class="input-group">
+        <label for="resume">Resume Text</label>
+        <textarea id="resume" placeholder="Paste resume content here...">Experienced Python Developer with expertise in FastAPI, Django, and AWS cloud migrations.</textarea>
+    </div>
+
+    <div class="input-group">
+        <label for="jd">Job Description</label>
+        <textarea id="jd" placeholder="Paste job description here...">We need a Python Backend Engineer with strong FastAPI skills and AWS experience.</textarea>
+    </div>
+
+    <button onclick="analyze()">Analyze Resume</button>
+
+    <div id="loading" class="loading">Analyzing with Gemini AI...</div>
+
+    <div id="result">
+        <div class="metric">
+            <div class="percentage" id="score">0%</div>
+            <div>Match Score</div>
+        </div>
+        
+        <div class="section-title">Strengths</div>
+        <ul id="strengths"></ul>
+
+        <div class="section-title">Missing Skills</div>
+        <ul id="missing"></ul>
+
+        <div class="section-title">Suggestions</div>
+        <ul id="suggestions"></ul>
+    </div>
+</div>
+
+<script>
+    async function analyze() {
+        const resume = document.getElementById('resume').value;
+        const jd = document.getElementById('jd').value;
+        const resultDiv = document.getElementById('result');
+        const loading = document.getElementById('loading');
+
+        loading.style.display = 'block';
+        resultDiv.style.display = 'none';
+
+        try {
+            const response = await fetch('http://127.0.0.1:8000/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ resume_text: resume, job_description: jd })
+            });
+
+            const data = await response.json();
+
+            document.getElementById('score').innerText = data.match_percentage + '%';
+            
+            fillList('strengths', data.strengths);
+            fillList('missing', data.missing_skills);
+            fillList('suggestions', data.improvement_suggestions);
+
+            resultDiv.style.display = 'block';
+        } catch (error) {
+            alert('Error connecting to API. Make sure uvicorn is running!');
+        } finally {
+            loading.style.display = 'none';
+        }
+    }
+
+    function fillList(id, items) {
+        const ul = document.getElementById(id);
+        ul.innerHTML = '';
+        items.forEach(item => {
+            const li = document.createElement('li');
+            li.innerText = item;
+            ul.appendChild(li);
+        });
+    }
+</script>
+
+</body>
+</html>
