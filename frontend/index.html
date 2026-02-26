@@ -312,12 +312,16 @@
             <div class="section-title">Tailored Resume Preview</div>
             <div id="tailored-text" class="resume-preview"></div>
 
-            <button style="margin-top: 1rem;" onclick="copyTailored()">Copy to Clipboard</button>
+            <div class="btn-group" style="margin-top: 1rem;">
+                <button onclick="copyTailored()">Copy Text</button>
+                <button class="btn-secondary" onclick="downloadPDF()">Download PDF</button>
+            </div>
         </div>
     </div>
 
     <script>
         let currentMode = 'text';
+        let lastTailoredText = "";
 
         function switchTab(mode) {
             currentMode = mode;
@@ -352,7 +356,7 @@
                 let response;
                 if (currentMode === 'text') {
                     const resume = document.getElementById('resume').value;
-                    response = await fetch('http://127.0.0.1:8000/analyze', {
+                    response = await fetch('/analyze', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ resume_text: resume, job_description: jd })
@@ -368,7 +372,7 @@
                     formData.append('file', file);
                     formData.append('job_description', jd);
 
-                    response = await fetch('http://127.0.0.1:8000/analyze-pdf', {
+                    response = await fetch('/analyze-pdf', {
                         method: 'POST',
                         body: formData
                     });
@@ -407,7 +411,7 @@
                 let response;
                 if (currentMode === 'text') {
                     const resume = document.getElementById('resume').value;
-                    response = await fetch('http://127.0.0.1:8000/tailor', {
+                    response = await fetch('/tailor', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ resume_text: resume, job_description: jd })
@@ -423,7 +427,7 @@
                     formData.append('file', file);
                     formData.append('job_description', jd);
 
-                    response = await fetch('http://127.0.0.1:8000/tailor-pdf', {
+                    response = await fetch('/tailor-pdf', {
                         method: 'POST',
                         body: formData
                     });
@@ -432,6 +436,7 @@
                 const data = await response.json();
 
                 if (response.ok) {
+                    lastTailoredText = data.tailored_resume;
                     document.getElementById('opt-score').innerText = data.optimization_score + '%';
                     fillList('key-changes', data.key_changes);
                     document.getElementById('tailored-text').innerText = data.tailored_resume;
@@ -445,6 +450,25 @@
             } finally {
                 loading.style.display = 'none';
             }
+        }
+
+        function downloadPDF() {
+            if (!lastTailoredText) return;
+
+            // Create a temporary hidden form to submit the text for download
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/download-pdf';
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'resume_text';
+            input.value = lastTailoredText;
+
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
         }
 
         function fillList(id, items) {

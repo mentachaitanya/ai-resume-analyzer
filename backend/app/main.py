@@ -1,9 +1,17 @@
-from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, File, UploadFile, Form
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.models.schemas import ResumeRequest, AnalyzeResponse, TailorResponse
 from app.services.gpt_service import analyze_resume, tailor_resume
 from app.services.pdf_parser import extract_text_from_pdf
+from app.services.pdf_generator import generate_resume_pdf
+import io
+import urllib.parse
+from pathlib import Path
+
+# Get the root directory (one level up from backend/)
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+FRONTEND_PATH = ROOT_DIR / "frontend" / "index.html"
 
 app = FastAPI(
     title="AI Resume Analyzer",
@@ -22,7 +30,7 @@ app.add_middleware(
 
 @app.get("/", include_in_schema=False)
 async def read_index():
-    return FileResponse("demo.html")
+    return FileResponse(FRONTEND_PATH)
 
 
 @app.post("/analyze", response_model=AnalyzeResponse)
@@ -63,4 +71,16 @@ def tailor_pdf(
     return tailor_resume(
         resume_text,
         job_description
+    )
+
+
+@app.post("/download-pdf")
+async def download_pdf(resume_text: str = Form(...)):
+    # Basic PDF generation from tailored text
+    pdf_buffer = generate_resume_pdf(resume_text)
+    
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": "attachment; filename=Tailored_Resume.pdf"}
     )

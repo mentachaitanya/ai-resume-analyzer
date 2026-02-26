@@ -37,7 +37,7 @@ Job Description:
         response = client.chat.completions.create(
             model=MODEL,
             messages=[
-                {"role": "system", "content": "You are a recruitment AI assistant."},
+                {"role": "system", "content": "You are a recruitment AI assistant. You must respond ONLY with a valid JSON object."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.3,
@@ -45,15 +45,22 @@ Job Description:
 
         content = response.choices[0].message.content.strip()
 
+        # Clean JSON if model wrapped it in markdown
+        if content.startswith("```json"):
+            content = content.replace("```json", "").replace("```", "").strip()
+        elif content.startswith("```"):
+            content = content.replace("```", "").strip()
+
         return json.loads(content)
 
-    except Exception:
+    except Exception as e:
+        print(f"ERROR in analyze_resume: {str(e)}")
         return {
             "match_percentage": 75,
             "missing_skills": ["Cloud deployment"],
             "strengths": ["Python", "REST APIs"],
             "improvement_suggestions": ["Add production deployment"],
-            "note": "Mock fallback response"
+            "note": f"Mock fallback response due to: {str(e)}"
         }
 
 
