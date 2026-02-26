@@ -1,14 +1,14 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from app.models.schemas import ResumeRequest, AnalyzeResponse
 from app.services.gpt_service import analyze_resume
-
-from fastapi.middleware.cors import CORSMiddleware
+from app.services.pdf_parser import extract_text_from_pdf
 
 app = FastAPI(
     title="AI Resume Analyzer",
     description="LLM-powered Resume vs Job Description Matching System",
-    version="1.0.0"
+    version="2.0.0"
 )
 
 # Enable CORS for the demo frontend
@@ -24,9 +24,23 @@ app.add_middleware(
 async def read_index():
     return FileResponse("demo.html")
 
+
 @app.post("/analyze", response_model=AnalyzeResponse)
 def analyze(data: ResumeRequest):
     return analyze_resume(
         data.resume_text,
         data.job_description
+    )
+
+
+@app.post("/analyze-pdf", response_model=AnalyzeResponse)
+def analyze_pdf(
+    file: UploadFile = File(...),
+    job_description: str = ""
+):
+    resume_text = extract_text_from_pdf(file.file)
+
+    return analyze_resume(
+        resume_text,
+        job_description
     )

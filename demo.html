@@ -45,6 +45,29 @@
             font-weight: 800;
         }
 
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 0.5rem;
+        }
+
+        .tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            color: var(--text-dim);
+            font-weight: 600;
+            transition: color 0.2s;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -0.5rem;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
         .input-group {
             margin-bottom: 1.5rem;
         }
@@ -67,11 +90,46 @@
             font-size: 0.95rem;
             resize: vertical;
             transition: border-color 0.2s;
+            box-sizing: border-box;
         }
 
         textarea:focus {
             outline: none;
             border-color: var(--primary);
+        }
+
+        .file-input-container {
+            display: none;
+            background-color: #0f172a;
+            border: 2px dashed #334155;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+
+        .file-input-container.active {
+            display: block;
+        }
+
+        .file-input-container:hover {
+            border-color: var(--primary);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-label {
+            cursor: pointer;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        #file-name {
+            margin-top: 0.5rem;
+            color: var(--text-dim);
+            font-size: 0.9rem;
         }
 
         button {
@@ -149,10 +207,29 @@
     <div class="container">
         <h1>AI Resume Analyzer</h1>
 
-        <div class="input-group">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('text')">Paste Text</div>
+            <div class="tab" onclick="switchTab('pdf')">Upload PDF</div>
+        </div>
+
+        <div id="text-input" class="input-group">
             <label for="resume">Resume Text</label>
             <textarea id="resume"
                 placeholder="Paste resume content here...">Experienced Python Developer with expertise in FastAPI, Django, and AWS cloud migrations.</textarea>
+        </div>
+
+        <div id="pdf-input" class="file-input-container">
+            <label class="file-label" for="resume-file">
+                <svg style="width:48px;height:48px;margin-bottom:1rem;" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <br>
+                Click to upload Resume PDF
+            </label>
+            <input type="file" id="resume-file" accept=".pdf" onchange="updateFileName()">
+            <div id="file-name">No file chosen</div>
         </div>
 
         <div class="input-group">
@@ -183,8 +260,28 @@
     </div>
 
     <script>
+        let currentMode = 'text';
+
+        function switchTab(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.tab[onclick="switchTab('${mode}')"]`).classList.add('active');
+
+            if (mode === 'text') {
+                document.getElementById('text-input').style.display = 'block';
+                document.getElementById('pdf-input').classList.remove('active');
+            } else {
+                document.getElementById('text-input').style.display = 'none';
+                document.getElementById('pdf-input').classList.add('active');
+            }
+        }
+
+        function updateFileName() {
+            const file = document.getElementById('resume-file').files[0];
+            document.getElementById('file-name').innerText = file ? file.name : 'No file chosen';
+        }
+
         async function analyze() {
-            const resume = document.getElementById('resume').value;
             const jd = document.getElementById('jd').value;
             const resultDiv = document.getElementById('result');
             const loading = document.getElementById('loading');
@@ -193,22 +290,44 @@
             resultDiv.style.display = 'none';
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/analyze', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ resume_text: resume, job_description: jd })
-                });
+                let response;
+                if (currentMode === 'text') {
+                    const resume = document.getElementById('resume').value;
+                    response = await fetch('http://127.0.0.1:8000/analyze', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ resume_text: resume, job_description: jd })
+                    });
+                } else {
+                    const file = document.getElementById('resume-file').files[0];
+                    if (!file) {
+                        alert('Please select a PDF file first!');
+                        loading.style.display = 'none';
+                        return;
+                    }
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('job_description', jd);
+
+                    response = await fetch('http://127.0.0.1:8000/analyze-pdf', {
+                        method: 'POST',
+                        body: formData
+                    });
+                }
 
                 const data = await response.json();
 
-                document.getElementById('score').innerText = data.match_percentage + '%';
-
-                fillList('strengths', data.strengths);
-                fillList('missing', data.missing_skills);
-                fillList('suggestions', data.improvement_suggestions);
-
-                resultDiv.style.display = 'block';
+                if (response.ok) {
+                    document.getElementById('score').innerText = data.match_percentage + '%';
+                    fillList('strengths', data.strengths);
+                    fillList('missing', data.missing_skills);
+                    fillList('suggestions', data.improvement_suggestions);
+                    resultDiv.style.display = 'block';
+                } else {
+                    alert('Error: ' + (data.detail || 'Analysis failed'));
+                }
             } catch (error) {
+                console.error(error);
                 alert('Error connecting to API. Make sure uvicorn is running!');
             } finally {
                 loading.style.display = 'none';
