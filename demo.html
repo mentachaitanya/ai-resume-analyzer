@@ -193,7 +193,7 @@
             resultDiv.style.display = 'none';
 
             try {
-                const response = await fetch('/analyze', {
+                const response = await fetch('http://127.0.0.1:8000/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ resume_text: resume, job_description: jd })
