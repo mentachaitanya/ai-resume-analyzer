@@ -15,6 +15,11 @@ class AnalyzeResponse(BaseModel):
 
 
 class TailorResponse(BaseModel):
-    tailored_resume: str
-    key_changes: List[str]
-    optimization_score: int
+    jd_intelligence: dict # Hunter Step
+    gap_matrix: List[dict] # Matrix Step
+    red_flags: List[str] # Critic Step
+    tailored_resume: str # Architect Step
+    scores: dict # Multi-dimensional scoring
+    hiring_probability: str
+    confidence_explanation: str
+    strategic_roadmap: dict # Improvement Step

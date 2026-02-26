@@ -301,15 +301,71 @@
 
         <!-- Tailoring Results -->
         <div id="tailor-result">
-            <div class="metric">
-                <div class="percentage" id="opt-score">0%</div>
-                <div>Optimization Score</div>
+            <div class="metric-grid"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                <div class="metric-card"
+                    style="background: #1e293b; padding: 1rem; border-radius: 0.5rem; text-align: center; border: 1px solid #334155;">
+                    <div class="percentage" id="score-keyword" style="font-size: 1.5rem;">0%</div>
+                    <div style="font-size: 0.8rem; color: #94a3b8;">ATS Keywords</div>
+                </div>
+                <div class="metric-card"
+                    style="background: #1e293b; padding: 1rem; border-radius: 0.5rem; text-align: center; border: 1px solid #334155;">
+                    <div class="percentage" id="score-semantic" style="font-size: 1.5rem;">0%</div>
+                    <div style="font-size: 0.8rem; color: #94a3b8;">Semantic Fit</div>
+                </div>
+                <div class="metric-card"
+                    style="background: #1e293b; padding: 1rem; border-radius: 0.5rem; text-align: center; border: 1px solid var(--primary);">
+                    <div class="percentage" id="score-strategic" style="font-size: 2rem;">0%</div>
+                    <div
+                        style="font-weight: 800; border-top: 1px solid #334155; margin-top: 0.5rem; padding-top: 0.5rem;">
+                        STRATEGIC MATCH</div>
+                </div>
             </div>
 
-            <div class="section-title">Key Changes Made</div>
-            <ul id="key-changes"></ul>
+            <div class="hiring-banner"
+                style="background: #064e3b; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 2rem; border: 1px solid var(--primary);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-weight: 800; color: var(--primary);">HIRING PROBABILITY</div>
+                        <div id="hiring-prob" style="font-size: 1.25rem; font-weight: 700;">MEDIUM</div>
+                    </div>
+                    <div id="conf-expl" style="font-size: 0.85rem; color: #a7f3d0; max-width: 60%;">Why? ...</div>
+                </div>
+            </div>
 
-            <div class="section-title">Tailored Resume Preview</div>
+            <div id="tailor-details">
+                <div class="section-title">Gap Analysis Matrix</div>
+                <div style="overflow-x: auto; margin-bottom: 2rem;">
+                    <table
+                        style="width: 100%; border-collapse: collapse; background: #1e293b; border-radius: 0.5rem; overflow: hidden; font-size: 0.85rem;">
+                        <thead>
+                            <tr style="background: #334155;">
+                                <th style="padding: 0.75rem; text-align: left;">Requirement</th>
+                                <th style="padding: 0.75rem; text-align: left;">Found?</th>
+                                <th style="padding: 0.75rem; text-align: left;">Severity</th>
+                                <th style="padding: 0.75rem; text-align: left;">Evidence</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matrix-body"></tbody>
+                    </table>
+                </div>
+
+                <div class="section-title" style="color: #ef4444;">🚩 Red Flags Detected</div>
+                <ul id="red-flags"
+                    style="background: #450a0a; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem;"></ul>
+
+                <div class="section-title">Strategic Roadmap</div>
+                <div style="background: #1e293b; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem;">
+                    <div style="font-weight: 700; color: var(--primary); margin-bottom: 0.5rem;">Positioning Advice:
+                    </div>
+                    <div id="pos-advice"
+                        style="font-size: 0.9rem; color: #cbd5e1; font-style: italic; margin-bottom: 1rem;"></div>
+                    <div style="font-weight: 700; color: var(--primary);">Next Steps:</div>
+                    <ul id="roadmap"></ul>
+                </div>
+            </div>
+
+            <div class="section-title">Tailored Resume Preview (ATS Optimized)</div>
             <div id="tailored-text" class="resume-preview"></div>
 
             <div class="btn-group" style="margin-top: 1rem;">
@@ -437,8 +493,41 @@
 
                 if (response.ok) {
                     lastTailoredText = data.tailored_resume;
-                    document.getElementById('opt-score').innerText = data.optimization_score + '%';
-                    fillList('key-changes', data.key_changes);
+
+                    // Scores
+                    document.getElementById('score-keyword').innerText = data.scores.keyword_match + '%';
+                    document.getElementById('score-semantic').innerText = data.scores.semantic_alignment + '%';
+                    document.getElementById('score-strategic').innerText = data.scores.strategic_match + '%';
+
+                    // Probability
+                    document.getElementById('hiring-prob').innerText = data.hiring_probability;
+                    document.getElementById('conf-expl').innerText = data.confidence_explanation;
+
+                    // Matrix Table
+                    const matrixBody = document.getElementById('matrix-body');
+                    matrixBody.innerHTML = '';
+                    data.gap_matrix.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.style.borderBottom = '1px solid #334155';
+                        tr.innerHTML = `
+                            <td style="padding: 0.75rem;">${row.requirement}</td>
+                            <td style="padding: 0.75rem;"><span style="color: ${row.status === 'Yes' ? '#10b981' : (row.status === 'Partial' ? '#f59e0b' : '#ef4444')}">${row.status}</span></td>
+                            <td style="padding: 0.75rem;">${row.severity}</td>
+                            <td style="padding: 0.75rem; color: #94a3b8;">${row.evidence}</td>
+                        `;
+                        matrixBody.appendChild(tr);
+                    });
+
+                    // Red Flags
+                    fillList('red-flags', data.red_flags);
+
+                    // Roadmap
+                    document.getElementById('pos-advice').innerText = data.strategic_roadmap.positioning_advice;
+                    fillList('roadmap', [
+                        ...data.strategic_roadmap.skills_to_learn.map(s => `🎓 Skill up: ${s}`),
+                        ...data.strategic_roadmap.projects_to_build.map(p => `🏗️ Build: ${p}`)
+                    ]);
+
                     document.getElementById('tailored-text').innerText = data.tailored_resume;
                     tailorDiv.style.display = 'block';
                 } else {
