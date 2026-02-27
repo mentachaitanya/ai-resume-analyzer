@@ -32,7 +32,6 @@ app.add_middleware(
 async def read_index():
     return FileResponse(FRONTEND_PATH)
 
-
 @app.post("/extract-text")
 def extract_text(file: UploadFile = File(...)):
     text = extract_text_from_pdf(file.file)

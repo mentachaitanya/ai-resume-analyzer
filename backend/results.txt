@@ -1,0 +1,174 @@
+--- Test 1 (Experience Gap) ---
+{
+  "jd_intelligence": {
+    "must_have": [
+      "8+ years of experience in software engineering",
+      "Proficiency in software development methodologies",
+      "Experience with system architecture and design"
+    ],
+    "high_impact": [
+      "Strong problem-solving skills",
+      "Ability to mentor junior engineers",
+      "Excellent communication skills"
+    ],
+    "nice_to_have": [
+      "Experience with cloud technologies",
+      "Knowledge of DevOps practices",
+      "Familiarity with agile development"
+    ],
+    "seniority_signals": "Senior Software Engineer indicates a need for extensive experience and leadership capabilities.",
+    "hidden_expectations": [
+      "Ability to lead projects and teams",
+      "Experience in high-stakes environments",
+      "Proven track record of delivering complex software solutions"
+    ]
+  },
+  "gap_matrix": [
+    {
+      "requirement": "8+ years of experience in software engineering",
+      "status": "No",
+      "evidence": "Candidate has only 1 year of experience.",
+      "severity": "High"
+    },
+    {
+      "requirement": "Proficiency in software development methodologies",
+      "status": "Partial",
+      "evidence": "Resume does not specify methodologies used.",
+      "severity": "Medium"
+    },
+    {
+      "requirement": "Experience with system architecture and design",
+      "status": "No",
+      "evidence": "No mention of architecture or design experience.",
+      "severity": "High"
+    },
+    {
+      "requirement": "Strong problem-solving skills",
+      "status": "Yes",
+      "evidence": "Implied through software engineering experience.",
+      "severity": "Medium"
+    },
+    {
+      "requirement": "Ability to mentor junior engineers",
+      "status": "No",
+      "evidence": "No mentoring experience mentioned.",
+      "severity": "High"
+    },
+    {
+      "requirement": "Excellent communication skills",
+      "status": "Partial",
+      "evidence": "No specific examples provided.",
+      "severity": "Medium"
+    },
+    {
+      "requirement": "Experience with cloud technologies",
+      "status": "No",
+      "evidence": "No mention of cloud technologies.",
+      "severity": "High"
+    },
+    {
+      "requirement": "Knowledge of DevOps practices",
+      "status": "No",
+      "evidence": "No mention of DevOps practices.",
+      "severity": "High"
+    },
+    {
+      "requirement": "Familiarity with agile development",
+      "status": "No",
+      "evidence": "No mention of agile methodologies.",
+      "severity": "High"
+    }
+  ],
+  "red_flags": [
+    "Significant gap in required experience",
+    "Lack of specific technical skills",
+    "No evidence of leadership or mentoring experience"
+  ],
+  "tailored_resume": "# Resume\n\n## Profile Summary\n\nDetail-oriented Software Engineer with 1 year of experience in developing scalable applications. Adept at problem-solving and collaborating with teams to deliver high-quality software solutions. Eager to leverage technical skills and grow into a senior role.\n\n## Experience\n\n### Software Engineer\n- Developed and maintained software applications, ensuring high performance and responsiveness.\n- Collaborated with cross-functional teams to troubleshoot and resolve technical issues, enhancing user satisfaction.\n- Participated in code reviews to uphold coding standards and improve code quality.\n\n## Skills\n- Proficient in programming languages such as Java and Python.\n- Strong analytical and problem-solving skills.\n- Familiar with version control systems like Git.\n\n## Education\n- Bachelor\u2019s Degree in Computer Science\n\n",
+  "scores": {
+    "keyword_match": 20,
+    "semantic_alignment": 30,
+    "seniority_alignment": 10,
+    "strategic_match": 15
+  },
+  "hiring_probability": "Low",
+  "confidence_explanation": "The candidate lacks the required 8+ years of experience and key technical skills necessary for the Senior Software Engineer role, resulting in a low hiring probability.",
+  "strategic_roadmap": {
+    "skills_to_learn": [
+      "Software development methodologies",
+      "System architecture and design",
+      "Cloud technologies",
+      "DevOps practices",
+      "Agile development"
+    ],
+    "projects_to_build": [
+      "Build a full-stack application using cloud services",
+      "Contribute to open-source projects to gain experience in system architecture",
+      "Develop a personal project using Agile methodologies"
+    ],
+    "positioning_advice": "Emphasize willingness to learn and grow, and highlight any relevant projects or experiences that demonstrate problem-solving and technical skills."
+  }
+}
+
+--- Test 2 (Partial Relevance) ---
+{
+  "jd_intelligence": {
+    "must_have": [
+      "Experience with backend web frameworks such as Django"
+    ],
+    "high_impact": [
+      "Ability to build scalable applications",
+      "Strong problem-solving skills"
+    ],
+    "nice_to_have": [
+      "Experience with RESTful APIs",
+      "Familiarity with Flask framework"
+    ],
+    "seniority_signals": "Mid-level developer with a focus on backend technologies",
+    "hidden_expectations": [
+      "Experience with team collaboration and agile methodologies"
+    ]
+  },
+  "gap_matrix": [
+    {
+      "requirement": "Experience with Django",
+      "status": "No",
+      "evidence": "Candidate has experience with Flask but not Django",
+      "severity": "High"
+    },
+    {
+      "requirement": "Ability to build scalable applications",
+      "status": "Partial",
+      "evidence": "Experience with RESTful APIs indicates some understanding of scalability",
+      "severity": "Medium"
+    },
+    {
+      "requirement": "Strong problem-solving skills",
+      "status": "Yes",
+      "evidence": "Implied through experience in API development",
+      "severity": "Medium"
+    }
+  ],
+  "red_flags": [
+    "Lack of experience with Django, which is a must-have requirement"
+  ],
+  "tailored_resume": "# Profile Summary\n\nDetail-oriented backend developer with experience in building RESTful APIs using the Flask framework. Proven ability to solve complex problems and contribute to scalable application development.\n\n## Experience\n\n- **Developed RESTful APIs** using the Flask framework, enhancing application performance and user experience for a client base of over 10,000 users.\n- **Collaborated with cross-functional teams** to identify and resolve technical issues, improving project delivery timelines by 20%.\n- **Participated in code reviews** and contributed to the development of best practices, fostering a culture of continuous improvement within the team.",
+  "scores": {
+    "keyword_match": 60,
+    "semantic_alignment": 70,
+    "seniority_alignment": 50,
+    "strategic_match": 55
+  },
+  "hiring_probability": "Medium",
+  "confidence_explanation": "The candidate has relevant experience in API development but lacks direct experience with Django, which is a critical requirement. However, their skills in Flask and problem-solving indicate potential for adaptability.",
+  "strategic_roadmap": {
+    "skills_to_learn": [
+      "Django framework",
+      "Advanced backend development practices"
+    ],
+    "projects_to_build": [
+      "Create a mini-project using Django to build a RESTful API"
+    ],
+    "positioning_advice": "Emphasize your experience with Flask and your ability to learn new frameworks quickly. Discuss your problem-solving skills and how they can be applied to Django."
+  }
+}
