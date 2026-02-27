@@ -14,30 +14,38 @@ MODEL = "openai/gpt-4o-mini"  # You can change model later
 
 
 def analyze_resume(resume_text: str, job_description: str) -> dict:
+    # Use a larger chunk of text, gpt-4o-mini has 128k context
+    resume_chunk = resume_text[:50000]
+    jd_chunk = job_description[:50000]
 
     prompt = f"""
-Analyze the resume against the job description.
+Deeply analyze the following Resume against the Job Description.
+
+SCORING RULES:
+1. PRECISION: If a skill is listed in the Resume (even in a simple 'Skills' list), it is a MATCH. Do not mark it as missing.
+2. EVIDENCE: Identify exact mentions.
+3. FAIRNESS: Be critical of seniority gaps but inclusive of technical keywords.
 
 Return strictly valid JSON:
 {{
   "match_percentage": number,
-  "missing_skills": [],
-  "strengths": [],
-  "improvement_suggestions": []
+  "missing_skills": ["Skills from JD not found anywhere in resume"],
+  "strengths": ["Strongest matches between Resume and JD"],
+  "improvement_suggestions": ["Actionable steps to improve matching"]
 }}
 
 Resume:
-{resume_text[:800]}
+{resume_chunk}
 
 Job Description:
-{job_description[:800]}
+{jd_chunk}
 """
 
     try:
         response = client.chat.completions.create(
             model=MODEL,
             messages=[
-                {"role": "system", "content": "You are a recruitment AI assistant. You must respond ONLY with a valid JSON object."},
+                {"role": "system", "content": "You are a professional Recruitment Analyst. You perform deep semantic analysis of resumes. Always respond in valid JSON."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.3,
@@ -73,27 +81,29 @@ MISSION: Analyze the JD and resume to generate a strategic, high-accuracy rewrit
 RULES:
 - NEVER invent skills or responsibilities.
 - Use formula: [Power Action Verb] + [Technical Context] + [Scale or Scope] + [Measurable Impact].
-- classify requirements into Must-Have, High-Impact, Nice-to-Have.
+- Classify requirements into Must-Have, High-Impact, Nice-to-Have.
+- ACCURACY: If a skill exists in the resume's 'Skills' section, status must be 'Yes' or 'Partial', NEVER 'No'.
+- SCALE: Evaluate if the candidate has worked at the required scale (e.g., millions of users).
 
 Return strictly valid JSON:
 {{
   "jd_intelligence": {{
-    "must_have": [],
-    "high_impact": [],
-    "nice_to_have": [],
-    "seniority_signals": "description",
-    "hidden_expectations": []
+    "must_have": ["Direct technical requirements from JD"],
+    "high_impact": ["Soft skills or desirable traits from JD"],
+    "nice_to_have": ["Bonus skills from JD"],
+    "seniority_signals": "Description of seniority level expected",
+    "hidden_expectations": ["What the recruiter is looking for but didn't explicitly say"]
   }},
   "gap_matrix": [
     {{
       "requirement": "skill/duty",
       "status": "Yes/Partial/No",
-      "evidence": "from resume",
+      "evidence": "Mention from resume or reason for partial/no",
       "severity": "Low/Medium/High"
     }}
   ],
-  "red_flags": ["repetition", "lack of metrics", "etc"],
-  "tailored_resume": "Markdown formatted full resume",
+  "red_flags": ["Repetition, lack of metrics, gaps, or domain mismatch"],
+  "tailored_resume": "STRATEGIC REWRITE: A full Markdown formatted resume. REWRITE the profile summary and bullet points to emphasize relevant skills from the JD. For example, if JD is IT Support and resume is Dev, emphasize troubleshooting and technical resolution over coding.",
   "scores": {{
     "keyword_match": 0-100,
     "semantic_alignment": 0-100,
@@ -101,19 +111,19 @@ Return strictly valid JSON:
     "strategic_match": 0-100
   }},
   "hiring_probability": "Low/Medium/High",
-  "confidence_explanation": "why",
+  "confidence_explanation": "Detailed explanation of why this match score was given",
   "strategic_roadmap": {{
-    "skills_to_learn": [],
-    "projects_to_build": [],
-    "positioning_advice": "text"
+    "skills_to_learn": ["Specific skills from JD that are missing"],
+    "projects_to_build": ["Mini-projects to demonstrate missing skills"],
+    "positioning_advice": "How to talk about this pivot in an interview"
   }}
 }}
 
 Resume:
-{resume_text[:2500]}
+{resume_text[:50000]}
 
 Job Description:
-{job_description[:2500]}
+{job_description[:50000]}
 """
     try:
         response = client.chat.completions.create(

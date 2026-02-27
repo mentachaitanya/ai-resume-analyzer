@@ -1,0 +1,95 @@
+{
+  "jd_intelligence": {
+    "must_have": [
+      "1-2 years IT experience",
+      "Good troubleshooting skills",
+      "Knowledge and experience in Desktop support",
+      "Windows 10 & 11",
+      "EUC technologies like McAfee Antivirus, VPN, Windows imaging",
+      "Outlook troubleshooting skills"
+    ],
+    "high_impact": [
+      "Good attitude and willingness to work in rotational shift",
+      "Good communication skills or good technical skills"
+    ],
+    "nice_to_have": [],
+    "seniority_signals": "Entry-level position with 0-2 years of experience required",
+    "hidden_expectations": [
+      "Ability to learn quickly and adapt to new technologies",
+      "Demonstrated problem-solving abilities in a technical environment"
+    ]
+  },
+  "gap_matrix": [
+    {
+      "requirement": "1-2 years IT experience",
+      "status": "Partial",
+      "evidence": "5 months of industry experience as a Software Developer",
+      "severity": "Medium"
+    },
+    {
+      "requirement": "Good troubleshooting skills",
+      "status": "Yes",
+      "evidence": "Experience in debugging and testing",
+      "severity": "Medium"
+    },
+    {
+      "requirement": "Knowledge and experience in Desktop support",
+      "status": "No",
+      "evidence": "No mention of desktop support experience",
+      "severity": "High"
+    },
+    {
+      "requirement": "Windows 10 & 11",
+      "status": "No",
+      "evidence": "No mention of Windows OS experience",
+      "severity": "High"
+    },
+    {
+      "requirement": "EUC technologies like McAfee Antivirus, VPN, Windows imaging",
+      "status": "No",
+      "evidence": "No mention of EUC technologies",
+      "severity": "High"
+    },
+    {
+      "requirement": "Outlook troubleshooting skills",
+      "status": "No",
+      "evidence": "No mention of Outlook experience",
+      "severity": "High"
+    },
+    {
+      "requirement": "Good communication skills or good technical skills",
+      "status": "Yes",
+      "evidence": "Technical skills demonstrated in software development",
+      "severity": "Medium"
+    }
+  ],
+  "red_flags": [
+    "Lack of desktop support experience",
+    "No mention of Windows OS experience",
+    "No mention of EUC technologies",
+    "No mention of Outlook troubleshooting skills"
+  ],
+  "tailored_resume": "### MENTA VENKATA CHAITANYA\n\n### SUMMARY\nMotivated Entry-level Software Developer with 5 months of experience in backend development and a strong foundation in troubleshooting and debugging. Proficient in Python, JavaScript, and REST APIs, with a commitment to providing technical support and resolving user issues effectively.\n\n### EXPERIENCE\n**Junior Python Developer**  \n*Sep 2025 - Present*  \n- Developed and maintained backend modules using Python and Django, enhancing system functionality for end users.  \n- Integrated RESTful APIs with SQL/MySQL databases, improving data accessibility and user experience.  \n- Utilized AI-assisted tools for debugging, reducing error resolution time by 20%.\n\n### SKILLS\nPython, JavaScript, Django, REST APIs, SQL, Debugging, Testing, Git, AWS (Basic), Troubleshooting, Communication Skills",
+  "scores": {
+    "keyword_match": 40,
+    "semantic_alignment": 50,
+    "seniority_alignment": 70,
+    "strategic_match": 45
+  },
+  "hiring_probability": "Medium",
+  "confidence_explanation": "The candidate has relevant technical skills and some experience in troubleshooting but lacks direct desktop support experience and knowledge of specific EUC technologies mentioned in the JD. However, their background in software development provides a foundation for learning the required skills.",
+  "strategic_roadmap": {
+    "skills_to_learn": [
+      "Desktop support",
+      "Windows 10 & 11",
+      "EUC technologies like McAfee Antivirus, VPN, Windows imaging",
+      "Outlook troubleshooting skills"
+    ],
+    "projects_to_build": [
+      "Create a simple desktop support guide for common issues",
+      "Set up a virtual machine with Windows 10/11 to practice troubleshooting",
+      "Develop a mini-project that integrates a VPN setup"
+    ],
+    "positioning_advice": "Emphasize your strong troubleshooting skills and willingness to learn new technologies. Discuss your technical background and how it can translate into effective desktop support."
+  }
+}
